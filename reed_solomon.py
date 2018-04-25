@@ -21,7 +21,7 @@ from dependencies import find_error_locations
 from dependencies import find_errors
 from dependencies import correct_errors
 def decode(input, length):
-    if len(input) > 255:
+    if len(input) > 64:
         raise ValueError("Message is too long!!!")
     output = list(input)
     syndromes = calculate_syndromes(output, length)

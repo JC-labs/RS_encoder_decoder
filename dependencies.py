@@ -1,9 +1,9 @@
-exponents = [0] * 512
-logarithms = [0] * 256
-def multiply_wo_look_up(x, y, polynomial = 0, field_characters_full = 256, carryless = True):
+exponents = [0] * 128
+logarithms = [0] * 64
+def multiply_wo_look_up(x, y, polynomial = 0, field_characters_full = 64):
     r = 0
     while y:
-        if y & 1: r = r ^ x if carryless else r + x
+        if y & 1: r = r ^ x
         y = y >> 1
         x = x << 1
         if polynomial > 0 and x & field_characters_full:
@@ -20,7 +20,7 @@ def multiply_polynomials(p,q):
             r[i+j] ^= multiply_integers(p[i], q[j])
     return r
 def power(x, power):
-    return exponents[(logarithms[x] * power) % 255]
+    return exponents[(logarithms[x] * power) % 63]
 def divide_polynomials(dividend, divisor):
     output = list(dividend)
     for i in range(0, len(dividend) - (len(divisor)-1)):
@@ -33,15 +33,15 @@ def divide_polynomials(dividend, divisor):
     return output[:separator], output[separator:]
 def initialize_log_tables(polynomial):
     global exponents, logarithms
-    exponents = [0] * 512
-    logarithms = [0] * 256
+    exponents = [0] * 128
+    logarithms = [0] * 64
     x = 1
-    for i in range(0, 255):
+    for i in range(0, 63):
         exponents[i] = x
         logarithms[x] = i
         x = multiply_wo_look_up(x, 2, polynomial)
-    for i in range(255, 512):
-        exponents[i] = exponents[i - 255]
+    for i in range(63, 128):
+        exponents[i] = exponents[i - 63]
     return [logarithms, exponents]
 
 
@@ -63,7 +63,7 @@ def scale_polynomial(p,x):
         r[i] = multiply_integers(p[i], x)
     return r
 def inverse_polynomial(x):
-    return exponents[255 - logarithms[x]]
+    return exponents[63 - logarithms[x]]
 def add_polinomials(p,q):
     r = [0] * max(len(p),len(q))
     for i in range(0,len(p)):
@@ -118,14 +118,14 @@ def divide_integers(x,y):
         raise ZeroDivisionError()
     if x==0:
         return 0
-    return exponents[(logarithms[x] + 255 - logarithms[y]) % 255]
+    return exponents[(logarithms[x] + 63 - logarithms[y]) % 63]
 def correct_errors(input, syndromes, error_positions):
     coeficient_positions = [len(input) - 1 - p for p in error_positions]
     error_locations = find_error_polynomial(coeficient_positions)
     error_values = find_error_values(syndromes[::-1], error_locations, len(error_locations) - 1)[::-1]
     errors = []
     for i in range(0, len(coeficient_positions)):
-        l = 255 - coeficient_positions[i]
+        l = 63 - coeficient_positions[i]
         errors.append(power(2, -l))
     error_magnitudes = [0] * (len(input))
     errors_length = len(errors)
