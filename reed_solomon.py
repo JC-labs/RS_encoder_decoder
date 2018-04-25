@@ -6,13 +6,13 @@ def initialize(polynomial):
 from dependencies import multiply_polynomials
 from dependencies import divide_polynomials
 from dependencies import power
-def encode(msg_in, length):
+def encode(input, length):
     polynomial = [1]
     for i in range(0, length):
         polynomial = multiply_polynomials(polynomial, [1, power(2, i)])
-    _, remainder = divide_polynomials(msg_in + [0] * (len(polynomial)-1), polynomial)
-    msg_out = msg_in + remainder
-    return msg_out
+    _, remainder = divide_polynomials(input + [0] * (len(polynomial) - 1), polynomial)
+    output = input + remainder
+    return output
 
 
 from dependencies import ReedSolomonError
