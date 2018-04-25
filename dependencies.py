@@ -1,13 +1,5 @@
 exponents = [0] * 512
 logarithms = [0] * 256
-def bitwise_multiply(x, y):
-    z = 0
-    i = 0
-    while (y >> i) > 0:
-        if y & (1 << i):
-            z ^= x << i
-        i += 1
-    return z
 def multiply_wo_look_up(x, y, polynomial = 0, field_characters_full = 256, carryless = True):
     r = 0
     while y:
@@ -30,15 +22,15 @@ def multiply_polynomials(p,q):
 def power(x, power):
     return exponents[(logarithms[x] * power) % 255]
 def divide_polynomials(dividend, divisor):
-    msg_out = list(dividend)
+    output = list(dividend)
     for i in range(0, len(dividend) - (len(divisor)-1)):
-        coef = msg_out[i]
+        coef = output[i]
         if coef != 0:
             for j in range(1, len(divisor)):
                 if divisor[j] != 0:
-                    msg_out[i + j] ^= multiply_integers(divisor[j], coef)
+                    output[i + j] ^= multiply_integers(divisor[j], coef)
     separator = -(len(divisor)-1)
-    return msg_out[:separator], msg_out[separator:] # return quotient, remainder.
+    return output[:separator], output[separator:]
 def initialize_log_tables(polynomial):
     global exponents, logarithms
     exponents = [0] * 512
